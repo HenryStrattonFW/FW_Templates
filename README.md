@@ -3,7 +3,7 @@
 Aseprite Plugin to provide a means of starting documents from pre defined templates.
 
 ## What is it?
-Like many pixel artists I sometimes partake in the prompts from the PixelDailies twitter account. For consistency all of those pieces are the same resolution, and use a similar setup with a background layer, and a foreground layer with a frame and logo. 
+Like many pixel artists I sometimes partake in the prompts from the [@Pixel_Dailies](https://twitter.com/Pixel_Dailies) twitter account. For consistency all of the pieces I create for those prompts are the same resolution, and use a similar setup with a background layer, and a foreground layer with a frame and logo. 
 
 Remembering the resolution, copying in an image of the frame and setting up layers each time is a small but still unnecessary step for something that you're going to be using a lot. So I decided to learn how to make scripts for Aseprite, and after a bit of learning, and a lot of pining for my usual language of C#, I ended up with this templates plugin.
 
