@@ -4,6 +4,9 @@ local detailsPopup = dofile(app.fs.joinPath(app.fs.userConfigPath, "extensions",
 
 local function Show()
 
+    ----------------------------------------------------------------------------------------
+    -- Initial setup of the dialog and Reset method.
+    ----------------------------------------------------------------------------------------
     local dlg = Dialog("Templates");
     local templates = {};
     local templateNames = {};
@@ -16,11 +19,6 @@ local function Show()
         Show();
     end
 
-    local function LogTemplates()
-        for i, template in ipairs(templates) do
-            pluginData.logger.Log(i..": " ..template.name .. " > ".. template.width .." x ".. template.height);
-        end
-    end
 
     ----------------------------------------------------------------------------------------
     -- Helper method to get a template by its name.
@@ -36,17 +34,15 @@ local function Show()
     end
 
     ----------------------------------------------------------------------------------------
-    -- Method to save templates to the configuration file.
+    -- Saves templates to the configuration file.
     ----------------------------------------------------------------------------------------
     local function SaveTemplates()
-        pluginData.logger.Log("Saving templates...");
-        LogTemplates();
         pluginData.prefs.templatesJson = pluginData.json.encode({data=templates});
         pluginData.logger.Log("Save Complete.");
     end
 
     ----------------------------------------------------------------------------------------
-    -- Saves template data for some initial 'default' templates.
+    -- Sets template data for some initial 'default' templates.
     ----------------------------------------------------------------------------------------
     local function SetDefaultTemplates()
         templates = {
@@ -62,7 +58,7 @@ local function Show()
     end
 
     ----------------------------------------------------------------------------------------
-    -- Method to load templates from the configuration file if present.
+    -- Loads templates from the configuration file if present, sets defaults if not.
     ----------------------------------------------------------------------------------------
     local function LoadTemplates()
         loadedTemplates = false;
@@ -79,8 +75,6 @@ local function Show()
         if loadedTemplates == false then
             SetDefaultTemplates();
         end
-
-        LogTemplates();
 
         templateCount = 0;
         for i, template in ipairs(templates) do
@@ -103,12 +97,12 @@ local function Show()
     end
 
     ----------------------------------------------------------------------------------------
-    -- Method to update the data for a given template, reloading the popup when complete.
+    -- Updates the data for a given template.
     ----------------------------------------------------------------------------------------
     local function UpdateTemplate(name, newData)
         local template = TryGetTemplate(name);
         if(template == nil) then
-            pluginData.logger.Error("Failed to get template of name: "..name);
+            app.alert("Failed to update template: "..name);
         else
             template.width = newData.width;
             template.height = newData.height;
@@ -117,7 +111,7 @@ local function Show()
     end
 
     ----------------------------------------------------------------------------------------
-    -- Method to update the data for a given template, reloading the popup when complete.
+    -- Removes a template by name from the collection.
     ----------------------------------------------------------------------------------------
     local function RemoveTemplate(name)
         pluginData.logger.Log("Removing template: "..name);
@@ -146,20 +140,13 @@ local function Show()
         end
     end
 
-
     ----------------------------------------------------------------------------------------
-    -- Toggles the view between file and preset modes.
+    -- Setup the controls for swapping between file and preset modes.
     ----------------------------------------------------------------------------------------
     local function SetFileDisplayMode(fileMode)
         pluginData.utils.set_visible(dlg, fileMode == false, {"templateDropdown","resetButton","detailsButton","createFromPresetButton"});
         pluginData.utils.set_visible(dlg, fileMode == true, {"createFromFileButton","file"});
     end
-
-
-    ----------------------------------------------------------------------------------------
-    -- Setup the primary display elements of the dialog, selection and details of templates.
-    ----------------------------------------------------------------------------------------
-    LoadTemplates();
 
     dlg:radio{
         id="radioPreset",
@@ -184,6 +171,7 @@ local function Show()
     ----------------------------------------------------------------------------------------
     -- UI for opening from a preset template (simple canvas size data).
     ----------------------------------------------------------------------------------------
+    LoadTemplates(); -- Make sure templates loaded before we try and setup the combo box.
     dlg:combobox {
         id = "templateDropdown",
         option = GetInitialSelection(),
@@ -206,9 +194,12 @@ local function Show()
         id="detailsButton",
         text="Edit",
         onclick=function()
+            -- Hand of the current template data to a details popup for editing.
             local selected = TryGetTemplate(dlg.data.templateDropdown);
             local result = detailsPopup.ShowDetails(selected.name, selected.width, selected.height);
-            local refresh = true;
+
+            -- Act on the resulting action from the popup response.
+            local refresh = (result.action ~= nil);
             if (result.action == "add") then
                 templates[templateCount+1] = result.template;
             elseif (result.action == "delete") then
@@ -220,6 +211,7 @@ local function Show()
                 UpdateTemplate(selected.name, result.template);
             end
 
+            -- If we changed anything, refresh the dialog to update displays.
             if(refresh == true) then
                 SaveTemplates();
                 Reset();
@@ -229,7 +221,7 @@ local function Show()
 
     dlg:button{
         id="createFromPresetButton",
-        text="Create From Selected",
+        text="Create",
         onclick=function()
             selected = TryGetTemplate(dlg.data.templateDropdown);
             if selected == nil then
@@ -251,7 +243,6 @@ local function Show()
     ----------------------------------------------------------------------------------------
     -- UI for opening from a template file (full file copy for detailed templates).
     ----------------------------------------------------------------------------------------
-
     dlg:file{
         id="file",
         open = true,
@@ -259,7 +250,7 @@ local function Show()
     };
     dlg:button{
         id="createFromFileButton",
-        text="Create From File",
+        text="Create",
         onclick=function()
             local original = Sprite{fromFile=dlg.data.file};
             local newSprite = Sprite(original);
@@ -269,8 +260,10 @@ local function Show()
         end
     }:newrow();
 
+    -- Set the initial display mode to ensure we're only showing one set of UI controls.
     SetFileDisplayMode(false);
 
+    -- Display the dialog, using the last known bounds if possible (minimizes visual impact when 'refreshing').
     if (pluginData.prefs.lastBounds == nil) then
         dlg:show{wait=false};
     else
