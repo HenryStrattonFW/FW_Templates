@@ -7,6 +7,10 @@ Like many pixel artists I sometimes partake in the prompts from the PixelDailies
 
 Remembering the resolution, copying in an image of the frame and setting up layers each time is a small but still unnecessary step for something that you're going to be using a lot. So I decided to learn how to make scripts for Aseprite, and after a bit of learning, and a lot of pining for my usual language of C#, I ended up with this templates plugin.
 
+## Extension-Base
+This plugin was built using [extension-base](https://github.com/david-fletcher/extension-base). A boiler plate project for creating plugins in aseprite provided by [David Fletcher](https://github.com/david-fletcher). Give the project a look. It was a huge help for someone like me who had never used the plugin feature of aseprite, and as someone new to Lua it was also a nice reference to start from.
+
+
 ## Installation
 As an aseprite extension, installation is simple.
 1. Download the packaged version of this extension [here](https://github.com/HenryStrattonFW/FW_Templates/raw/master/FW_Templates.aseprite-extension)
