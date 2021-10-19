@@ -1,0 +1,18 @@
+{
+    "name": "FW_Templates",
+    "displayName": "FW Templates",
+    "description": "A utility window for starting a document from predefined templates",
+    "version": "1.0",
+    "author": { "name": "Henry Stratton (FatWednesday)",
+                "email": "henrystrattonfw@gmail.com",
+                "url": "fatwednesday.co.uk" },
+    "contributors": [ ],
+    "publisher": "Henry Stratton (FatWednesday)",
+    "license": "MIT",
+    "categories": [ "Scripts" ],
+    "contributes": {
+      "scripts": [
+          { "path": "./plugin.lua" }
+      ]
+    }
+  }
