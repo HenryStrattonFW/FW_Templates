@@ -119,6 +119,20 @@ local utils = {
         for i,target in ipairs(targets) do
             dlg:modify{id=target,visible=show};
         end
+    end,
+
+    get_indexed_filename = function(prefix)
+        local idx = 1;
+        local tmpName = prefix.."-"..tostring(idx);
+        for i,sprite in ipairs(app.sprites) do
+            local currSpriteName = app.fs.fileTitle(sprite.filename);
+            if(currSpriteName == tmpName) then
+                idx = idx+1;
+                tmpName = prefix.."-"..tostring(idx);
+            end
+        end
+
+        return tmpName;
     end
 };
 

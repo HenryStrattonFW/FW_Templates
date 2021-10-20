@@ -254,8 +254,10 @@ local function Show()
         onclick=function()
             local original = Sprite{fromFile=dlg.data.file};
             local newSprite = Sprite(original);
-            original:close();
+            newSprite.filename = pluginData.utils.get_indexed_filename("NewSprite");
             app.activeSprite = newSprite;
+            original:close();
+            app.refresh();
             dlg:close();
         end
     }:newrow();
